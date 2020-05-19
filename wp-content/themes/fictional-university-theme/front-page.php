@@ -8,7 +8,7 @@
     <h2 class="headline headline--medium">We think you&rsquo;ll like it here.</h2>
     <h3 class="headline headline--small">Why don&rsquo;t you check out the <strong>major</strong> you&rsquo;re
       interested in?</h3>
-    <a href="#" class="btn btn--large btn--blue">Find Your Major</a>
+    <a href="<?php echo get_post_type_archive_link('program') ?>" class="btn btn--large btn--blue">Find Your Major</a>
   </div>
 </div>
 
@@ -19,9 +19,21 @@
 
 
       <?php
+      $today=date('Ymd');
       $homepageEvents = new WP_Query(array(
         'posts_per_page' => 2,
-        'post_type' => 'event'
+        'post_type' => 'event',
+        'meta_key'=> 'event_date',
+        'orderby' => 'meta_value_num',
+        'order'=> 'ASC', //ascending
+        'meta_query' => array(
+          array(
+            'key' => 'event_date',
+            'compare' => '>=',
+            'value' => $today,
+            'type'=> 'numeric'
+          )
+        )
       ));
       
       while($homepageEvents->have_posts()){
@@ -29,8 +41,15 @@
         ?>
       <div class="event-summary">
         <a class="event-summary__date t-center" href="#">
-          <span class="event-summary__month">Mar</span>
-          <span class="event-summary__day">25</span>
+          <span class="event-summary__month">
+            <?php 
+              $eventDate = new DateTime(get_field('event_date'));
+              echo $eventDate->format('M');
+            ?>
+          </span>
+          <span class="event-summary__day">
+            <?php echo $eventDate->format('d'); ?>
+          </span>
         </a>
         <div class="event-summary__content">
           <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink() ?>">
@@ -46,9 +65,9 @@
 
       <?php
       }
-    
     ?>
-      <p class="t-center no-margin"><a href="<?php get_post_type_archive_link('event') ?>" class="btn btn--blue">View
+      <p class="t-center no-margin"><a href="<?php echo get_post_type_archive_link('event'); ?>"
+          class="btn btn--blue">View
           All
           Events</a></p>
 
